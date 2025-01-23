@@ -88,16 +88,37 @@ resource "aws_iam_policy" "s3-iampolicy" {
 	EOF
 }
 
-#Import IAM group and attaching S3 with IAM policy
+#Creating group and attaching S3 with IAM policy
 resource "aws_iam_group" "group1" {
 	name = "group1"
 }
-data "aws_iam_group" "group1" {
-	group_name = "group1"
-}
+
 resource "aws_iam_group_policy_attachment" "s3-iampolicyattachment" {
-	group = aws_iam_group.group1.arn
+	group = aws_iam_group.group1.name
 	policy_arn = aws_iam_policy.s3-iampolicy.arn
+}
+
+#Creating users and assigning them to the group
+resource "aws_iam_user" "user1" {
+	name = "user1"
+}
+
+resource "aws_iam_user" "user2" {
+  name = "user2"
+}
+
+resource "aws_iam_user_group_membership" "user1_membership" {
+	user = aws_iam_user.user1.name
+	groups = [
+		aws_iam_group.group1.name
+	]
+}
+
+resource "aws_iam_user_group_membership" "user2_membership" {
+	user = aws_iam_user.user2.name
+	groups = [
+		aws_iam_group.group1.name
+	]
 }
 
 # Windows VM1
